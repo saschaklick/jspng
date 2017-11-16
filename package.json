@@ -1,6 +1,6 @@
 {
   "name": "jspng",
-  "version": "0.0.1",
+  "version": "1.0.0",
   "description": "Generate uncompressed PNG images.",
   "main": "jspng.js",
   "directories": {
@@ -9,10 +9,18 @@
   "scripts": {
     "test": "mocha test"
   },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/saschaklick/jspng.git"
+  },
   "keywords": [
     "png",
     "image"
   ],
-  "author": "Sascha Klick",
-  "license": "MIT"
+  "author": "Sascha Klick <github@s<lastname>.de> (https://github.com/saschaklick)",
+  "contributors": [
+    "Sascha Klick <github@s<lastname>.de> (https://github.com/saschaklick)"
+  ],
+  "license": "MIT",
+  "homepage": "https://github.com/saschaklick/jspng.git"
 }

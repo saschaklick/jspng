@@ -1,8 +1,158 @@
-<html>
+<!DOCTYPE html>
+<html style="height: 100%;">
 	<head>
+		<style>
+			#tiles::-webkit-scrollbar-track{ -webkit-box-shadow: inset 0 0 6px rgba(0,0,0,0.3); border-radius: 10px; background-color: #fff; margin: 0 15%; }
+			#tiles::-webkit-scrollbar{ width: 16px; }
+			#tiles::-webkit-scrollbar-thumb { border-radius: 10px; -webkit-box-shadow: inset 0 0 6px rgba(0,0,0,.3); background-color: #aaa; }
+			#tiles{ transition: opacity 500ms ease-in }
+		</style>
 		<script src="jspng.js"></script>
 	</head>
-	<body>
-		<div style="width: 500px; height: 500px; background-size: contain;">
+	<body style="display: flex; flex-direction: column; margin: 0; height: 100%; font-family: sans-serif;">
+		<div style="display: flex; align-items: center; font-size: 0.8em; position: relative; background: linear-gradient(#eee, #fff, #ccc); padding: 4px 4px 8px 4px; border-bottom: 2px ridge #eee; box-shadow: 0 4px 8px rgba(0,0,0,.5); color: #333;">
+			<label style="margin: 0 4px; font-weight: bold;">Width</label>
+			<input style="margin: 0 4px;" type="number" max="9999" onchange="window.width = Number(this.value); createTiles(window.width, window.height, window.colortype);" value="256"></input>
+			<label style="margin: 0 4px; font-weight: bold;">Height</label>
+			<input style="margin: 0 4px;"type="number" max="9999" onchange="window.height = Number(this.value); createTiles(window.width, window.height, window.colortype);" value="256"></input>
+			<label style="margin: 0 4px; font-weight: bold;">Input mode</label>
+			<input style="margin: 0 4px;"type="text" maxlength="8" onchange="window.colortype = this.value; createTiles(window.width, window.height, window.colortype);" value="rgba"></input>
+			<div style="flex: 1;"></div>
+			<a style="margin: 0 4px; text-decoration: none; color: #333;" href="https://github.com/saschaklick/jspng">https://github.com/saschaklick/jspng</a>
+		</div>
+		<div style="flex: 1; display: flex; justify-content: center; align-items: center; padding: 0 0; background-image: url(data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIzMiIgaGVpZ2h0PSIzMiI+PHJlY3Qgd2lkdGg9IjE2IiBoZWlnaHQ9IjE2IiBmaWxsPSIjZjBmMGYwIj48L3JlY3Q+PHJlY3QgeD0iMTYiIHk9IjE2IiB3aWR0aD0iMTYiIGhlaWdodD0iMTYiIGZpbGw9IiNmMGYwZjAiPjwvcmVjdD48L3N2Zz4K);">
+			<div id="tiles" style="display: flex; align-items: center; justify-content: center; overflow-x: auto; padding: 4px; border-radius: 10px;"></div>		
+		</div>
+		<script>
+			var jspng = new JSPNG(new Buffer(0), {
+				inputmode : 'rgba',
+				meta      : {
+					'Software' : JSPNG.VERSION + ' (https://github.com/saschaklick/jspng)',
+					'Author'   : 'Sascha Klick'
+				}
+			});
+			
+			const createTiles = function(width, height, inputmode){
+				width     = width     || 256;
+				height    = height    || 256;
+				inputmode = inputmode || 'rgba';				
+				
+				var pixels = new Buffer(width * height * 4).fill(0x00);
+				{
+					const Color = function(r, g, b, a){ Color._buffer = new Buffer([r, g, b, a]); };
+					const Draw  = function(x, y){ var i;
+						i = ((y + 0) * wid + (x + 0)) * 4; if(i > 0 && i < pixels.length) Color._buffer.copy(pixels, i);
+						i = ((y + 1) * wid + (x + 0)) * 4; if(i > 0 && i < pixels.length) Color._buffer.copy(pixels, i);
+						i = ((y - 1) * wid + (x + 0)) * 4; if(i > 0 && i < pixels.length) Color._buffer.copy(pixels, i);
+						i = ((y + 0) * wid + (x + 1)) * 4; if(i > 0 && i < pixels.length) Color._buffer.copy(pixels, i);
+						i = ((y + 0) * wid + (x - 1)) * 4; if(i > 0 && i < pixels.length) Color._buffer.copy(pixels, i);
+					};
+
+					wid = width; hei = height;
+					
+					Color(0xff, 0x00, 0xff, 0xff);
+					
+					for(var y = 0; y < hei; y++) for(var x = 0; x < wid; x++){
+						var p_i = (y * wid + x) * 4;
+						new Buffer([ Math.floor((y / hei) * 0xff), Math.floor(((wid - x) / wid) * 0xff), Math.floor((x / wid) * 0xff), Math.max((x / wid) * 0xff, (y / hei) * 0xff) ]).copy(pixels, p_i);
+					}
+					for(var y = 0; y < hei; y++){
+						Color(0xff, 0xff, 0xff, 0xff); Draw(Math.floor(wid / 2), y);
+					}
+					for(var x = 0; x < wid; x++){
+						Color(0xff, 0xff, 0xff, 0xff); Draw(x, Math.floor(hei / 2));
+					}
+					for(var x = 0; x < wid; x++){
+						var y = Math.floor(Math.cos((x / wid) * Math.PI * 2) * (hei / 4) + (hei / 2));
+						Color(0xff, 0x00, 0x00, 0xff); Draw(x, y);
+						Color(0x00, 0xff, 0x00, 0xff); Draw(x, hei - y);
+					}
+					for(var rad = 0; rad < Math.PI * 2; rad += 0.0001){
+						Color(0x00, 0x00, 0xff, 0xff); Draw(Math.floor(Math.cos(rad) * (wid / 4) + (wid / 2)), Math.floor(Math.sin(rad) * (hei / 4) + (hei / 2)));
+					}
+				}
+				
+				var tiles = document.getElementById('tiles');
+				if(!tiles){
+					tiles = document.createElement('div');
+					tiles.setAttribute('id', 'tiles');
+					document.body.appendChild(tiles);
+				}
+				while(tiles.firstChild) tiles.removeChild(tiles.firstChild);
+				tiles.style.font    = 'normal 0.8em sans-serif';
+				tiles.style.opacity = 0;
+				
+				setTimeout(function(){
+				try{
+				
+				jspng.setInput(pixels);
+				jspng.setSize(width, height);
+				jspng.setInputFormat(inputmode);
+				
+				const colortypes = ['truecolor', 'truecolor+alpha', 'grayscale', 'grayscale+alpha'];
+				for(var c_i in colortypes){
+					var colortype = colortypes[c_i];
+					
+					jspng.setColorType(colortype);
+					
+					var start_ms = window.performance.now();
+					var png      = jspng.toBuffer();
+					var time_ms  = window.performance.now() - start_ms;
+					
+					var base64 = btoa(png.reduce(function(v,a){ return v + String.fromCharCode(a); }, ''));
+					
+					var tile = document.createElement('div');
+					tile.style.display         = 'inline-flex';
+					tile.style.flexDirection   = 'column';
+					tile.style.alignItems      = 'flex-end';
+					tile.style.margin          = '8px';
+					tile.style.textAlign       = 'right';
+					
+					var img = document.createElement('img');
+					img.setAttribute('src', 'data:image/png;base64,' + base64);
+					img.style.margin    = '0 0 4px 0';
+					img.style.boxShadow = '4px 4px 16px rgba(0,0,0,0.75)';
+					img.style.cursor    = 'pointer';
+					img.colortype       = colortype;
+					img.onclick         = function(){
+						var f = document.createElement('iframe');
+						f.style.maxHeight = 1;
+						f.style.border    = 'none';
+						document.body.appendChild(f);
+						var d = this;
+						setTimeout(function(){
+							f.contentWindow.document.body.innerHTML = '<a href="' + d.getAttribute('src') + '" download="jspng ' + d.colortype + '.png" target="_blank" type="image/png">image</a>';
+							setTimeout(function(){
+								var ev = f.contentWindow.document.createEvent('MouseEvent');
+								ev.initMouseEvent('click');
+								f.contentWindow.document.body.firstChild.dispatchEvent(ev);
+								setTimeout(function(){ document.body.removeChild(f); }, 100);
+							}, 1);
+						}, 0);
+					};
+					tile.appendChild(img);
+					
+					var lbl = document.createElement('div');
+					lbl.style.textShadow = '0 1px 1px #eee';
+					lbl.style.padding    = '2px 4px';
+					lbl.innerHTML = '<table style="font-size: 0.9em; text-align: right;"><tbody><tr><td style="font-weight: bold;">' + colortype + '</td><td>&compfn;</td><td>' + jspng._width + '&times;' + jspng._height + '</tr><tr><td>' + time_ms.toFixed(2) + 'ms</td><td>&compfn;</td><td>' + (png.length / 1024).toFixed(2) + 'kb</td></tr></tbody></table>';
+					tile.appendChild(lbl);
+					
+					tiles.appendChild(tile);
+				}
+				
+				}catch(err){
+					while(tiles.firstChild) tiles.removeChild(tiles.firstChild);
+					tiles.innerHTML = '<div style="color: red; font: 2em bold inherited;">' + err + '</div>';
+				}
+				
+				
+				setTimeout(function(){ tiles.style.opacity = 1; }, 0);
+				
+				}, 1);
+				
+			};
+			createTiles(window.width, window.height, window.inputmode);
+		</script>
 	</body>
 </html>

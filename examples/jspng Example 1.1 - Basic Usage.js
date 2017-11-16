@@ -1,4 +1,4 @@
-const JSPNG = require('../jspng.js');
+const JSPNG = require('jspng');
 const fs    = require('fs');
 
 const Color = function(r, g, b, a){ Color._buffer = new Buffer([r, g, b, a]); };
