@@ -10,12 +10,12 @@ const expect = chai.expect;
 describe("imagemagick and jspng compare output", function() {
 	
 	var generate_solid_color_buffer = function(w, h, r, g, b){
-		var image = Buffer(w * h * 3);
+		var image = JSPNG.Buffer(w * h * 3);
 		for(var i = 0; i < w * h * 3; i += 3){ image[i + 0] = r; image[i + 1] = g; image[i + 2] = b; }
 		return image;
 	}
 	var generate_solid_color_alpha_buffer = function(w, h, r, g, b, a){
-		var image = Buffer(w * h * 4);
+		var image = JSPNG.Buffer(w * h * 4);
 		for(var i = 0; i < w * h * 4; i += 4){ image[i + 0] = r; image[i + 1] = g; image[i + 2] = b;  image[i + 3] = a; }
 		return image;
 	}
@@ -23,11 +23,11 @@ describe("imagemagick and jspng compare output", function() {
 	describe("image buffer generation helpers", function() {
 		it("generate_solid_color_buffer", function(){
 			var image = generate_solid_color_buffer(2, 2, 0xff, 0x88, 0x44);
-			expect(image).to.deep.equal(new Buffer([0xff, 0x88, 0x44, 0xff, 0x88, 0x44, 0xff, 0x88, 0x44, 0xff, 0x88, 0x44]));
+			expect(image).to.deep.equal(new JSPNG.Buffer([0xff, 0x88, 0x44, 0xff, 0x88, 0x44, 0xff, 0x88, 0x44, 0xff, 0x88, 0x44]));
 		});
 		it("generate_solid_color_alpha_buffer", function(){
 			var image = generate_solid_color_alpha_buffer(2, 2, 0xff, 0x88, 0x44, 0x22);
-			expect(image).to.deep.equal(new Buffer([0xff, 0x88, 0x44, 0x22, 0xff, 0x88, 0x44, 0x22, 0xff, 0x88, 0x44, 0x22, 0xff, 0x88, 0x44, 0x22]));
+			expect(image).to.deep.equal(new JSPNG.Buffer([0xff, 0x88, 0x44, 0x22, 0xff, 0x88, 0x44, 0x22, 0xff, 0x88, 0x44, 0x22, 0xff, 0x88, 0x44, 0x22]));
 		});
 	});
 	
@@ -44,8 +44,8 @@ describe("imagemagick and jspng compare output", function() {
 			
 			for(var c_i in colors){
 				var color      = colors[c_i];
-				var color_rgb  = '#' + new Buffer([color.r, color.g, color.b]).toString('hex').toUpperCase();
-				var color_rgba = '#' + new Buffer([color.r, color.g, color.b, color.a]).toString('hex').toUpperCase();
+				var color_rgb  = '#' + new JSPNG.Buffer([color.r, color.g, color.b]).toString('hex').toUpperCase();
+				var color_rgba = '#' + new JSPNG.Buffer([color.r, color.g, color.b, color.a]).toString('hex').toUpperCase();
 				
 				var colortype = 'truecolor';
 				it("generate " + colortype + "@" + size[0] + "x" + size[1] + "  " + color_rgb, function(size, color, colordesc, colortype){ return function(done) {
@@ -62,7 +62,7 @@ describe("imagemagick and jspng compare output", function() {
 						gm_file    = os.tmpdir() + '/image-' +  colordesc + '-' + colortype + '@' + size[0] + 'x' + size[1] + '-gm.png';
 			
 					var promise = new Promise(function(resolve, reject){
-						exec('convert -size ' + size[0] + 'x' + size[1] + ' xc:#' + Buffer([color.r, color.g, color.b]).toString('hex') + ' "' + gm_file + '"', function(error, stdout, stderr){
+						exec('convert -size ' + size[0] + 'x' + size[1] + ' xc:#' + JSPNG.Buffer([color.r, color.g, color.b]).toString('hex') + ' "' + gm_file + '"', function(error, stdout, stderr){
 							if(error) reject(error); else {
 								exec('compare -metric mse "' + jspng_file + '" "' + gm_file + '" null', function(error, stdout, stderr){
 									resolve(Number(stderr.split(' ')[0]));
@@ -88,7 +88,7 @@ describe("imagemagick and jspng compare output", function() {
 						gm_file    = os.tmpdir() + '/image-' +  colordesc + '-' + colortype + '@' + size[0] + 'x' + size[1] + '-gm.png';
 			
 					var promise = new Promise(function(resolve, reject){
-						exec('convert -size ' + size[0] + 'x' + size[1] + ' xc:#' + Buffer([color.r, color.g, color.b, color.a]).toString('hex') + ' "' + gm_file + '"', function(error, stdout, stderr){
+						exec('convert -size ' + size[0] + 'x' + size[1] + ' xc:#' + JSPNG.Buffer([color.r, color.g, color.b, color.a]).toString('hex') + ' "' + gm_file + '"', function(error, stdout, stderr){
 							if(error) reject(error); else {
 								exec('compare -metric mse "' + jspng_file + '" "' + gm_file + '" null', function(error, stdout, stderr){
 									resolve(Number(stderr.split(' ')[0]));

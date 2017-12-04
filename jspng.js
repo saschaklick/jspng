@@ -2,7 +2,7 @@
  *
  * @file    Raw pixel data to PNG image converter.
  * @link    https://github.com/saschaklick/jspng
- * @version 1.0.0
+ * @version 1.1.0
  *
  * @author  Sascha Klick
  *
@@ -31,13 +31,13 @@
 var JSPNG = function(input, options){
 	this.options = options || {};
 	
-	if(Buffer.isBuffer(input)){
+	if(JSPNG.Buffer.isBuffer(input)){
 		this.setInput(input);
 	}else{
 		throw new Error('first argument needs to be a buffer');
 	}
 	
-	this._fill  = new Buffer(8).fill(0x00);
+	this._fill  = new JSPNG.Buffer(8).fill(0x00);
 	
 	this.setInputFormat(this.options['inputmode'] || 'r8g8b8a8');
 	this.setColorType(this.options['colortype'] || 'truecolor');
@@ -61,7 +61,7 @@ var JSPNG = function(input, options){
  *
  * @author    Sascha Klick
  */
-JSPNG.VERSION = 'JSPNG 1.0.0';
+JSPNG.VERSION = 'JSPNG 1.1.0';
 
 /**
  * @desc      List of supported color types.
@@ -160,7 +160,7 @@ JSPNG.prototype.setColorType = function(colorType){
  * @author    Sascha Klick
  */
 JSPNG.prototype.setInput = function(input){
-	if(Buffer.isBuffer(input)){
+	if(JSPNG.Buffer.isBuffer(input)){
 		this._pixels = input;
 	}else{
 		this._pixels = null;
@@ -179,13 +179,13 @@ JSPNG.prototype.toBuffer = function(){
 	   this._height === null)   throw new Error('height and/or width not set; call setSize(width, height) first');
 	if(this._pixels === null)   throw new Error('pixels not set; call setPixels(buffer) first');
 	
-	var output = Buffer.concat([ this._header(), this._IHDR(), this._bKGD(), this._IDAT() ]);
+	var output = JSPNG.Buffer.concat([ this._header(), this._IHDR(), this._bKGD(), this._IDAT() ]);
 	
 	for(var keyword in this.options.meta){
-		output = Buffer.concat([ output, this._tEXt(keyword, this.options.meta[keyword]) ]);
+		output = JSPNG.Buffer.concat([ output, this._tEXt(keyword, this.options.meta[keyword]) ]);
 	}
 	
-	return Buffer.concat([ output, this._IEND() ]);
+	return JSPNG.Buffer.concat([ output, this._IEND() ]);
 };
 
 /** @function JSPNG#_header
@@ -196,7 +196,7 @@ JSPNG.prototype.toBuffer = function(){
  * @author    Sascha Klick
  */
 JSPNG.prototype._header = function(){
-	return new Buffer([0x89, 0x50, 0x4E, 0x47, 0x0D, 0x0A, 0x1A, 0x0A]);
+	return new JSPNG.Buffer([0x89, 0x50, 0x4E, 0x47, 0x0D, 0x0A, 0x1A, 0x0A]);
 };
 
 /** @function JSPNG#_IHDR
@@ -207,7 +207,7 @@ JSPNG.prototype._header = function(){
  * @author    Sascha Klick
  */
 JSPNG.prototype._IHDR = function(){
-	var ihdr = new Buffer(13);
+	var ihdr = new JSPNG.Buffer(13);
 	ihdr.writeUInt32BE(this._width, 0);
 	ihdr.writeUInt32BE(this._height, 4);
 	ihdr.writeUInt8(this._bitDepth, 8);
@@ -226,7 +226,7 @@ JSPNG.prototype._IHDR = function(){
  * @author    Sascha Klick
  */
 JSPNG.prototype._IEND = function(){
-	return this._chunk('IEND', new Buffer(0));
+	return this._chunk('IEND', new JSPNG.Buffer(0));
 };
 
 /** @function JSPNG#_tEXt
@@ -237,7 +237,7 @@ JSPNG.prototype._IEND = function(){
  * @author    Sascha Klick
  */
 JSPNG.prototype._tEXt = function(keyword, text){
-	return this._chunk('tEXt', Buffer.concat([ new Buffer(keyword).slice(0, 80), new Buffer([0]), new Buffer(text) ]));
+	return this._chunk('tEXt', JSPNG.Buffer.concat([ new JSPNG.Buffer(keyword).slice(0, 80), new JSPNG.Buffer([0]), new JSPNG.Buffer(text) ]));
 };
 
 /** @function JSPNG#_IDAT
@@ -247,17 +247,17 @@ JSPNG.prototype._tEXt = function(keyword, text){
  * 
  * @author    Sascha Klick
  */
-JSPNG.prototype._bKGD = function(){ return new Buffer(0);
-	if(!(this._colorType & 4)) return new Buffer(0);
+JSPNG.prototype._bKGD = function(){ return new JSPNG.Buffer(0);
+	if(!(this._colorType & 4)) return new JSPNG.Buffer(0);
 	if(this._colorType & 1){
-		return this._chunk('bKGD', new Buffer([0x00]));	
+		return this._chunk('bKGD', new JSPNG.Buffer([0x00]));	
 	}else
 	if(this._colorType & 2){
-		return this._chunk('bKGD', new Buffer([0xff, 0xff, 0xff, 0xff, 0xff, 0xff]));	
+		return this._chunk('bKGD', new JSPNG.Buffer([0xff, 0xff, 0xff, 0xff, 0xff, 0xff]));	
 	}else{
-		return this._chunk('bKGD', new Buffer([0xff, 0xff]));	
+		return this._chunk('bKGD', new JSPNG.Buffer([0xff, 0xff]));	
 	}
-	return new Buffer(0);
+	return new JSPNG.Buffer(0);
 };
 
 /** @function JSPNG#_IDAT
@@ -268,7 +268,7 @@ JSPNG.prototype._bKGD = function(){ return new Buffer(0);
  * @author    Sascha Klick
  */
 JSPNG.prototype._IDAT = function(){
-	var imagedata = new Buffer(((this._width * Math.floor(this._color_type.bpp / 8)) + 1) * this._height), buf_pos = 0, p_i = 0;
+	var imagedata = new JSPNG.Buffer(((this._width * Math.floor(this._color_type.bpp / 8)) + 1) * this._height), buf_pos = 0, p_i = 0;
 	for(var y = 0; y < this._height; y++){
 		imagedata[buf_pos++] = 0;
 		for(var x = 0; x < this._width; x++){
@@ -321,7 +321,7 @@ JSPNG.prototype._IDAT = function(){
  * @author    Sascha Klick
  */
 JSPNG.prototype._chunk = function(type, buffer){
-	var ret = new Buffer(buffer.length + 12);
+	var ret = new JSPNG.Buffer(buffer.length + 12);
 	ret.writeUInt32BE(buffer.length, 0, 4);
 	ret.write(type, 4, 4, 'ascii');
 	buffer.copy(ret, 8);
@@ -389,7 +389,7 @@ var ADLER32 = function(in_buf){
  */
 var ZLIBDEFLATE = function(in_buf){
 	var in_i = 0, out_i = 0;
-	var out_buf = new Buffer(2 + in_buf.length + (Math.ceil(in_buf.length / ZLIBDEFLATE.MAX_BLOCK_SIZE) * 5) + 4);
+	var out_buf = new JSPNG.Buffer(2 + in_buf.length + (Math.ceil(in_buf.length / ZLIBDEFLATE.MAX_BLOCK_SIZE) * 5) + 4);
 	
 	const cmf = 0x78, flg = 0x01;
 	out_buf.writeUInt8(cmf, out_i++);
@@ -431,14 +431,14 @@ if(typeof module === 'object' && typeof module.exports === 'object'){
  * risk. It will probably not work.
  * 
  **********************************************************************/
-if(typeof Buffer !== 'function' && typeof window === 'object'){
-	window.Buffer = Uint8ClampedArray;
+JSPNG.Buffer = (typeof module !== 'undefined' && module.exports) ? Buffer : function(){
+	var Buffer = Uint8ClampedArray;
 	Buffer.isBuffer = function(obj){
 		return obj instanceof Buffer;
 	};
 	Buffer.concat = function(buffers){
 		var len = 0, pos = 0;
-		for(var i = 0; i < buffers.length; i++) len += buffers[i].length;
+		for(var i = 0; i < buffers.length; i++) len += buffers[i].length;  
 		var ret = new Buffer(len);
 		for(var i = 0; i < buffers.length; i++){ ret.set(buffers[i], pos); pos += buffers[i].length; }
 		return ret;
@@ -463,4 +463,5 @@ if(typeof Buffer !== 'function' && typeof window === 'object'){
 		encoder.encoding = enc || 'utf-8';
 		this.set(encoder.encode(text), pos);
 	};
-}
+	return Buffer;
+}(this);
