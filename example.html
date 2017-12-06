@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html style="height: 100%;">
 	<head>
+		<meta name="viewport" content="width=device-width, initial-scale=1">
 		<style>
 			#tiles::-webkit-scrollbar-track{ -webkit-box-shadow: inset 0 0 6px rgba(0,0,0,0.3); border-radius: 10px; background-color: #fff; margin: 0 15%; }
 			#tiles::-webkit-scrollbar{ width: 16px; }
@@ -8,14 +9,13 @@
 			#tiles{ transition: opacity 500ms ease-in }
 			
 			@media only all and (orientation: portrait) {
-				body { font-size: 32px; }
 				#tiles { flex-direction: column; }
 				#tiles > div { width: 100%; }
-				#header { flex-direction: column; justify-content: stretch; align-items: stretch !important; padding: 32px; }
-				#header > a { margin: 20px 20px 0 0 !important; }
-				#header > div { display: flex; align-items: center; margin: 20px 20px 20px 0; }
+				#header { flex-direction: column; justify-content: stretch; align-items: stretch !important; padding: 3px; }
+				#header > a { margin: 2px 2px 0 0 !important; }
+				#header > div { display: flex; align-items: center; margin: 2px 2px 2px 0; }
 				#header > div > label { flex: 1; }
-				#header > div > input { flex: 2; font-size: 1em; padding: 20px; }
+				#header > div > input { flex: 2; font-size: 1em; padding: 2px; }
 				.mobile-hide { display: none !important; }
 			}
 		</style>
