@@ -10,14 +10,13 @@ $ npm install jspng
 
 ```js
 var fs    = require('fs');
-var jspng = require('./jspng.js');
+var jspng = require('jspng');
 
-var pixels = jspng.Buffer(128 * 128 * 4).fill(0xff);
+var pixels = jspng.Buffer(128 * 128 * 4).fill(new Buffer([ 0x00, 0x00, 0xff, 0x88 ]));
 
-var png = new jspng(pixels, {width: 128, height: 128, inputmode: 'rgba', meta: { 'Software': jspng.VERSION } } );
+var png = new jspng(pixels, { width: 128, height: 128, inputmode: 'rgba', meta: { 'Software': jspng.VERSION }});
 
 fs.writeFileSync('jspng.png', png.toBuffer());
-
 ```
 For more examples see `examples` folder.
 
