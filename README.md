@@ -22,16 +22,16 @@ For more examples see `examples` folder.
 
 ## Documentation
 
-The *jspng* package was created to run in both server-side application using *NodeJS 0.12* as well as in most - if not all - modern Browsers but specifically *Mozilla Firefox 56+* and *Chromium 61+*.
+The *jspng* package was created to run in both server-side application using *NodeJS 0.12* as well as in most - if not all - modern browsers but specifically *Mozilla Firefox 56+* and *Chromium 61+*.
 
-Its initial use case was the creation of dynamically generated PNG textures for X3D models, which were at first generated and previewed in a clientside Browser application using [X3DOM](https://www.x3dom.org/) and then stored by a server process which regenerated the textures based on parameters provided by the client, rather than being send the whole client-generated binary PNG file.
+Its initial use case was the creation of dynamically generated PNG textures for X3D models, which were at first generated and previewed in a client-side browser application using [X3DOM](https://www.x3dom.org/) and then stored by a server process which regenerated the textures based on parameters provided by the client, rather than being send the whole client-generated binary file.
 
-While originally being developed for *NodeJS*, Browser support was added by implementing a shim stub of *NodeJS*'s `Buffer` class in *ECMAScript* (being the basis for all modern Browser's Javascript implemenation) using `TypedArray` classes and subclasses.
+While originally being developed for *NodeJS*, browser support was added by implementing a shim stub of *NodeJS*'s `Buffer` class in *ECMAScript* (being the basis for all modern browser's Javascript implemenation) using `TypedArray` classes and subclasses.
 
-Furthermore the implementation had to remain **dependence-free** due to the very different APIs for handling binary data present in the server and client environment, which results in *jspng* not implementing any kind of compression of the image data in PNG. While this creates unusually big PNG files, the data is quickly decoded when needed; a plus in our *X3DOM* and any similar use case.
+Furthermore the implementation had to remain **dependence-free** due to the very different APIs for handling binary data present in the server and client environments, which results in *jspng* not implementing any kind of compression of the image data. While this creates unusually big PNG files, the data is quickly decoded when needed and the images are standard-compliant; an advantage in our *X3DOM* and any similar use case.
 
 ## Features
-Beside the support for truecolor and greyscale PNG images with and without alpha, adding meta data is supported. See the example above.
+Beside the support for true color and greyscale images with and without alpha, adding meta data is supported. See the example above.
 
 ### Input modes
 
@@ -39,12 +39,12 @@ The raw pixel data supplied to create the image is somewhat freely configurable,
 
 Color and alpha channels can furthermore be freely arranged or even dropped using the `inputmode` option. `'argb'` would interpret the pixel data as starting with the alpha channel, followed by red, green and blue channel. Each pixel would still be 32-bit in size in this example.
 
-A set of-8 bit data points can be visualized in a black-to-red PNG imagemap by using `'r'`, meaning that each pixel only 8-bits in size.
+A set of 8-bit data points can be visualized in a black-to-red 2-dimensional imagemap by using `'r'`, meaning that each pixel is only 8 bits in size.
 
-Using `'...b'` on pixel data that is actually encoded in RGBA-format would ignore the first 24 bits of each pixel and visualize the alpha channel as blue in the resulting PNG.
+Using `'...b'` on pixel data that is actually encoded in RGBA-format would ignore the first 24 bits of each pixel and visualize the alpha channel as blue in the resulting image.
 
 ### Image dimension prediction
-While you are strongly encouraged to provide the width and height of the image described by your pixel data, *jspng* will try to estimate the image dimenstions should you choose not to. Should one or both dimensions not be specified, *jspng* will use the size of the provided pixel data buffer to fit all pixels into the image.
+While you are strongly encouraged to provide the width and height of the image described by your pixel data, *jspng* will try to estimate the image dimensions should you choose not to. Should one dimension not be specified, *jspng* will use the size of the provided pixel data buffer to fit all pixels into the image.
 
 Providing neither width nor height, *jspng* will assume the image data should be arranged as a square.
 
